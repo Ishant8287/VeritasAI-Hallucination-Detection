@@ -1,19 +1,20 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [tailwindcss(), react()],
+  base: "./", // ✅ THIS LINE FIXES YOUR ISSUE
   server: {
     proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:5005',
+      "/api": {
+        target: "http://127.0.0.1:5005",
         changeOrigin: true,
       },
-      '/health': {
-        target: 'http://127.0.0.1:5005',
+      "/health": {
+        target: "http://127.0.0.1:5005",
         changeOrigin: true,
       },
     },
   },
-})
+});
