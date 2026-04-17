@@ -1,14 +1,16 @@
-const API_BASE = import.meta.env.VITE_API_URL || "/api";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 /**
  * Verify an LLM response — extracts claims, checks against knowledge base.
  * @param {string} llmResponse — the raw LLM text to fact-check
- * @returns {Promise<{ claims: Array, auditId: string }>}
  */
 export async function verifyResponse(llmResponse) {
-  const res = await fetch(`${API_BASE}/verify`, {
+  const res = await fetch(`${API_BASE}/api/verify`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": "123456" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "123456",
+    },
     body: JSON.stringify({ llmResponse }),
   });
 
@@ -23,12 +25,9 @@ export async function verifyResponse(llmResponse) {
 
 /**
  * Fetch paginated audit logs.
- * @param {number} page
- * @param {number} limit
- * @returns {Promise<{ data: Array, total: number, page: number, totalPages: number }>}
  */
 export async function fetchLogs(page = 1, limit = 20) {
-  const res = await fetch(`${API_BASE}/logs?page=${page}&limit=${limit}`, {
+  const res = await fetch(`${API_BASE}/api/logs?page=${page}&limit=${limit}`, {
     headers: {
       "x-api-key": "123456",
     },
@@ -44,11 +43,9 @@ export async function fetchLogs(page = 1, limit = 20) {
 
 /**
  * Check backend health.
- * @returns {Promise<{ status: string, uptime: number }>}
  */
 export async function checkHealth() {
-  const baseUrl = API_BASE.replace(/\/api$/, "");
-  const res = await fetch(`${baseUrl}/health`);
+  const res = await fetch(`${API_BASE}/health`);
   if (!res.ok) throw new Error("Backend unreachable");
   return res.json();
 }
