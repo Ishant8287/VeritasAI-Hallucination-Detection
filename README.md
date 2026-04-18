@@ -30,9 +30,17 @@ VeritasAI introduces a verification layer that ensures responses are:
 
 ## 📸 Demo
 
-![VeritasAI Demo](./screenshots/demo.png)
+### 🧠 LLM Response → Claim Extraction  
+Breaks LLM output into individual factual claims  
+
+![LLM Response](./screenshots/llm-response.png)
 
 ---
+
+### 🔍 Verification → Final Verdict  
+Validates claims using vector search and returns confidence score  
+
+![Verification](./screenshots/verification.png)
 
 ## 🔄 System Flow
 
