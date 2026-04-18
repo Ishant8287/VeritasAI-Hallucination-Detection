@@ -1,139 +1,170 @@
 # 🚀 VeritasAI — AI Hallucination Detection System
 
-A full-stack middleware that detects and verifies hallucinations in LLM outputs by breaking responses into factual claims and validating them using vector search + LLM scoring.
+VeritasAI is a full-stack middleware that detects and verifies hallucinations in LLM outputs by breaking responses into factual claims and validating them using vector search and LLM-based scoring.
 
-> Built to solve a critical problem: LLMs generating incorrect or fabricated information.
+> Built to solve a real problem: LLMs generating incorrect or fabricated information.
 
 ---
 
-## 🧠 Overview
+## 🧠 Problem
 
-VeritasAI acts as a verification layer between LLMs and end users.
+LLMs often produce confident but incorrect answers (hallucinations), making them unreliable for critical use cases.
 
-Instead of blindly trusting LLM outputs:
-- Extracts individual factual claims
-- Matches them against a knowledge base (vector DB)
-- Verifies each claim using evidence or LLM fallback
-- Logs everything for auditing
+VeritasAI introduces a verification layer that ensures responses are:
 
-Result: Reliable and explainable AI outputs.
+* Fact-checked
+* Evidence-backed
+* Auditable
+
+---
+
+## 🔍 What it Does
+
+* Splits LLM responses into individual claims
+* Matches claims against a vector database (Pinecone)
+* Verifies using knowledge base or LLM fallback
+* Returns verdict with confidence and reasoning
+* Logs all verifications for auditing
+
+---
+
+## 📸 Demo
+
+![VeritasAI Demo](./screenshots/demo.png)
+
+---
+
+## 🔄 System Flow
+
+LLM Response
+→ Claim Extraction
+→ Embedding Generation
+→ Vector Search (Pinecone)
+→ Verification (KB or LLM fallback)
+→ Scoring + Confidence
+→ Audit Logging
 
 ---
 
 ## ⚙️ Tech Stack
 
-- Backend: Node.js, Express  
-- Frontend: React (Vite)  
-- Database: MongoDB  
-- Vector Database: Pinecone  
-- LLM: Groq (Llama 3.3 70B)  
-- Embeddings: MiniLM-L6-v2 (local via Transformers.js)
+* **Backend:** Node.js, Express
+* **Frontend:** React (Vite)
+* **Database:** MongoDB
+* **Vector DB:** Pinecone
+* **LLM:** Groq (LLaMA 3.3 70B)
+* **Embeddings:** MiniLM-L6-v2 (local)
 
 ---
 
-## 🔄 Verification Pipeline
+## 🔬 Verification Pipeline
 
-1. Claim Extraction  
-   Extracts factual claims from LLM response using Groq
+1. **Claim Extraction**
+   Extracts factual claims from LLM output
 
-2. Embedding  
-   Converts each claim into 384-dimension vector (local, no API cost)
+2. **Embedding**
+   Converts each claim into vector form (384-dim)
 
-3. Vector Search  
-   Retrieves top matches from Pinecone knowledge base
+3. **Vector Search**
+   Retrieves closest matches from Pinecone
 
-4. Verification Routing  
-   - If similarity >= 0.75 → use KB evidence  
-   - Else → fallback to LLM evaluation
+4. **Verification Routing**
 
-5. Scoring  
-   Returns verdict, confidence, and reasoning
+   * Similarity ≥ 0.75 → use KB evidence
+   * Else → fallback to LLM
 
-6. Audit Logging  
-   Stores all results in MongoDB (30-day TTL)
+5. **Scoring**
+   Generates verdict + confidence
+
+6. **Audit Logging**
+   Stores results in MongoDB (TTL-based cleanup)
 
 ---
 
 ## 🔥 Key Features
 
-- AI hallucination detection middleware  
-- Claim-level verification (not whole response)  
-- Hybrid verification (Vector DB + LLM fallback)  
-- Auto-learning system (verified claims cached back to Pinecone)  
-- Deduplication to prevent redundant API calls  
-- Graceful degradation (handles API failures safely)  
-- Role-ready API system for integration  
+* Claim-level hallucination detection
+* Hybrid verification (Vector DB + LLM)
+* Auto-learning (verified claims cached)
+* Deduplication to reduce redundant calls
+* Graceful failure handling
+* API-ready architecture
+
+---
+
+## ⚔️ Challenges & Learnings
+
+* Designing claim-level verification instead of full-response validation
+* Handling low similarity cases in vector search
+* Reducing unnecessary LLM calls
+* Managing latency in multi-step pipeline
+
+---
+
+## 🚀 Future Improvements
+
+* Real-time streaming verification
+* Improved claim extraction accuracy
+* Feedback loop for better verification
+* Caching for performance optimization
 
 ---
 
 ## 🏗️ Project Structure
 
+```
 veritasAI/
-├── veritasAI-backend/
-│   ├── src/
-│   │   ├── config/
-│   │   ├── middleware/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   └── utils/
-│   ├── scripts/
-│   ├── app.js
-│   ├── server.js
-│   └── .env.example
-└── veritasAI-frontend/
-    ├── src/
-    │   ├── api/
-    │   ├── components/
-    │   └── pages/
-    └── .env.example
+├── backend/
+│   ├── config/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   └── utils/
+│
+└── frontend/
+    ├── components/
+    ├── pages/
+    └── api/
+```
 
 ---
 
-## 🛠️ Setup & Installation
+## 🛠️ Setup
 
-### Prerequisites
-- Node.js >= 18
-- Pinecone account (index: 384 dimension, cosine metric)
-- Groq API key
-- MongoDB URI
+### Backend
 
----
+```
+cd veritasAI-backend
+npm install
+cp .env.example .env
+npm run seed
+npm start
+```
 
-### Backend Setup
+### Frontend
 
-cd veritasAI-backend  
-npm install  
-
-cp .env.example .env  
-
-# Seed knowledge base  
-npm run seed  
-
-# Start server  
-npm start  
+```
+cd veritasAI-frontend
+npm install
+cp .env.example .env.local
+npm run dev
+```
 
 ---
 
-### Frontend Setup
-
-cd veritasAI-frontend  
-npm install  
-
-cp .env.example .env.local  
-
-npm run dev  
-
----
-
-## 🔌 API Reference
+## 🔌 API
 
 ### POST /api/verify
 
-Verifies claims in an LLM response.
-
-Request:
 ```json
 {
   "llmResponse": "The speed of light is 300,000 km/s"
 }
+```
+
+---
+
+## 📄 License
+
+MIT License
