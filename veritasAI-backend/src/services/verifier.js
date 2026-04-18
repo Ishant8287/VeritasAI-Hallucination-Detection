@@ -8,7 +8,7 @@ import { withRetry } from "../utils/retry.js";
 const PINECONE_SCORE_THRESHOLD = 0.75;
 const LLM_MODEL = "llama-3.3-70b-versatile";
 const PINECONE_WRITE_CONFIRMATION_ATTEMPTS = 5;
-const PINECONE_WRITE_CONFIRMATION_DELAY_MS = 150;
+const PINECONE_WRITE_CONFIRMATION_DELAY_MS = 300;
 const CLAIM_CACHE_VERSION = "v2";
 
 let groqClient;

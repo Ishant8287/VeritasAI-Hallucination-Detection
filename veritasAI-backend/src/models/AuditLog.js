@@ -25,7 +25,7 @@ const claimResultSchema = new mongoose.Schema(
     },
     source: {
       type: String,
-      enum: ["llm", "knowledge_base", "pinecone"],
+      enum: ["llm", "pinecone"], // removed dead "knowledge_base" value
       default: "pinecone",
     },
     evidence: [

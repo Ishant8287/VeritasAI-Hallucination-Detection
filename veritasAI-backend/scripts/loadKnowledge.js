@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
-dotenv.config();
-
-import { getEmbedding } from "../src/utils/embeddings.js";
-import { getIndex } from "../src/config/pinecone.js";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: resolve(__dirname, "../.env") });
 
 const ingestData = async (documents) => {
   if (!Array.isArray(documents) || documents.length === 0) {

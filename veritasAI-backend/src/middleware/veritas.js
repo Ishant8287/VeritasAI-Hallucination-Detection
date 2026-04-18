@@ -3,9 +3,6 @@ import { verifyClaims } from "../services/verifier.js";
 import { scoreClaim } from "../services/scorer.js";
 import { AuditLog } from "../models/AuditLog.js";
 
-const normalizeSource = (source) =>
-  source === "llm" ? "llm" : "pinecone";
-
 export const factCheckResponse = async (req, res, next) => {
   try {
     const { llmResponse } = req.body;
@@ -26,7 +23,7 @@ export const factCheckResponse = async (req, res, next) => {
       });
     }
 
-    //Extract claims
+    // Extract claims
     const claims = await extractClaims(normalizedResponse);
 
     if (claims.length === 0) {
@@ -39,13 +36,13 @@ export const factCheckResponse = async (req, res, next) => {
       });
     }
 
-    //Verify claims — vector search → evidence
+    // Verify claims — vector search → evidence
     const verifiedResults = (await verifyClaims(claims)).filter(Boolean);
 
-    //Score each claim — LLM results pass through; KB results go through scoreClaim()
+    // Score each claim
     const finalResults = await Promise.all(
       verifiedResults.map(async (item) => {
-        // verifyClaim() already called the LLM → use its verdict directly
+        // LLM verified → use its verdict directly
         if (item.source === "llm") {
           return {
             claim: item.claim,
@@ -53,7 +50,7 @@ export const factCheckResponse = async (req, res, next) => {
             confidence: item.confidence,
             reason: item.reason,
             evidence: [],
-            source: normalizeSource(item.source),
+            source: "llm",
           };
         }
 
@@ -65,7 +62,7 @@ export const factCheckResponse = async (req, res, next) => {
             confidence: item.confidence,
             reason: item.reason,
             evidence: [],
-            source: normalizeSource(item.source),
+            source: "pinecone",
           };
         }
 
@@ -82,13 +79,13 @@ export const factCheckResponse = async (req, res, next) => {
       }),
     );
 
-    //Save to MongoDB
+    // Save to MongoDB
     const audit = await AuditLog.create({
       originalResponse: normalizedResponse,
       claims: finalResults,
     });
 
-    //Return response
+    // Return response
     return res.status(200).json({
       status: "success",
       data: {

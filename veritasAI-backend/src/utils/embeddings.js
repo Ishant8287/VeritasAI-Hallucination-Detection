@@ -20,6 +20,7 @@ export const getEmbedding = async (text) => {
 
     return Array.from(output.data);
   } catch (error) {
+    extractor = null; // reset so next call retries initialization
     console.error("Embedding error:", error.message);
     return [];
   }

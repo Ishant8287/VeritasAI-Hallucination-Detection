@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+const API_BASE = (
+  import.meta.env.VITE_API_URL ?? "http://localhost:5005"
+).replace(/\/$/, "");
 
 /**
  * Verify an LLM response — extracts claims, checks against knowledge base.
@@ -9,7 +11,7 @@ export async function verifyResponse(llmResponse) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": "123456",
+      "x-api-key": import.meta.env.VITE_API_KEY ?? "",
     },
     body: JSON.stringify({ llmResponse }),
   });
@@ -29,7 +31,7 @@ export async function verifyResponse(llmResponse) {
 export async function fetchLogs(page = 1, limit = 20) {
   const res = await fetch(`${API_BASE}/api/logs?page=${page}&limit=${limit}`, {
     headers: {
-      "x-api-key": "123456",
+      "x-api-key": import.meta.env.VITE_API_KEY ?? "",
     },
   });
 
