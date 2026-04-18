@@ -1,112 +1,139 @@
-# VeritasAI – AI Hallucination Detection System
+# 🚀 VeritasAI — AI Hallucination Detection System
 
-VeritasAI is a backend system designed to detect hallucinations in Large Language Model (LLM) responses using retrieval-based verification and scoring techniques.
+A full-stack middleware that detects and verifies hallucinations in LLM outputs by breaking responses into factual claims and validating them using vector search + LLM scoring.
 
-## 🚀 Core Idea
-
-LLMs often generate incorrect or fabricated information ("hallucinations").
-VeritasAI extracts claims from responses and verifies them using vector search + scoring.
+> Built to solve a critical problem: LLMs generating incorrect or fabricated information.
 
 ---
 
-## ⚙️ How It Works
+## 🧠 Overview
 
-1. **Claim Extraction**
+VeritasAI acts as a verification layer between LLMs and end users.
 
-   * Breaks AI response into verifiable claims
+Instead of blindly trusting LLM outputs:
+- Extracts individual factual claims
+- Matches them against a knowledge base (vector DB)
+- Verifies each claim using evidence or LLM fallback
+- Logs everything for auditing
 
-2. **Embedding Generation**
-
-   * Converts claims into vector embeddings
-
-3. **Vector Search (Pinecone)**
-
-   * Finds relevant real-world data
-
-4. **Verification Engine**
-
-   * Compares claim vs retrieved data
-
-5. **Scoring System**
-
-   * Assigns confidence score
-
-6. **Audit Logging**
-
-   * Stores results for tracking & analysis
+Result: Reliable and explainable AI outputs.
 
 ---
 
-## 🛠️ Tech Stack
+## ⚙️ Tech Stack
 
-* Node.js
-* Express.js
-* Pinecone (Vector DB)
-* OpenAI / LLM APIs
-* JavaScript (Modular Architecture)
-
----
-
-## 📂 Project Structure
-
-```
-src/
- ├── config/        # DB & Pinecone setup
- ├── middleware/    # Auth & verification pipeline
- ├── models/        # Data models (AuditLog)
- ├── routes/        # API endpoints
- ├── services/      # Core logic (extract, verify, score)
- └── utils/         # Helpers (embeddings, retry, errors)
-```
+- Backend: Node.js, Express  
+- Frontend: React (Vite)  
+- Database: MongoDB  
+- Vector Database: Pinecone  
+- LLM: Groq (Llama 3.3 70B)  
+- Embeddings: MiniLM-L6-v2 (local via Transformers.js)
 
 ---
 
-## 🔌 API Endpoint
+## 🔄 Verification Pipeline
 
-### POST `/verify`
+1. Claim Extraction  
+   Extracts factual claims from LLM response using Groq
 
-Processes LLM response and checks hallucination:
+2. Embedding  
+   Converts each claim into 384-dimension vector (local, no API cost)
 
+3. Vector Search  
+   Retrieves top matches from Pinecone knowledge base
+
+4. Verification Routing  
+   - If similarity >= 0.75 → use KB evidence  
+   - Else → fallback to LLM evaluation
+
+5. Scoring  
+   Returns verdict, confidence, and reasoning
+
+6. Audit Logging  
+   Stores all results in MongoDB (30-day TTL)
+
+---
+
+## 🔥 Key Features
+
+- AI hallucination detection middleware  
+- Claim-level verification (not whole response)  
+- Hybrid verification (Vector DB + LLM fallback)  
+- Auto-learning system (verified claims cached back to Pinecone)  
+- Deduplication to prevent redundant API calls  
+- Graceful degradation (handles API failures safely)  
+- Role-ready API system for integration  
+
+---
+
+## 🏗️ Project Structure
+
+veritasAI/
+├── veritasAI-backend/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── utils/
+│   ├── scripts/
+│   ├── app.js
+│   ├── server.js
+│   └── .env.example
+└── veritasAI-frontend/
+    ├── src/
+    │   ├── api/
+    │   ├── components/
+    │   └── pages/
+    └── .env.example
+
+---
+
+## 🛠️ Setup & Installation
+
+### Prerequisites
+- Node.js >= 18
+- Pinecone account (index: 384 dimension, cosine metric)
+- Groq API key
+- MongoDB URI
+
+---
+
+### Backend Setup
+
+cd veritasAI-backend  
+npm install  
+
+cp .env.example .env  
+
+# Seed knowledge base  
+npm run seed  
+
+# Start server  
+npm start  
+
+---
+
+### Frontend Setup
+
+cd veritasAI-frontend  
+npm install  
+
+cp .env.example .env.local  
+
+npm run dev  
+
+---
+
+## 🔌 API Reference
+
+### POST /api/verify
+
+Verifies claims in an LLM response.
+
+Request:
 ```json
 {
-  "input": "AI generated text here"
+  "llmResponse": "The speed of light is 300,000 km/s"
 }
-```
-
----
-
-## ⚙️ Setup
-
-```bash
-git clone https://github.com/Ishant8287/VeritasAI-AI-Hallucination-Detection.git
-cd VeritasAI-AI-Hallucination-Detection
-
-npm install
-npm start
-```
-
----
-
-## 📌 Environment Variables
-
-Create `.env`:
-
-```
-GROQ_API_KEY=your_key
-PINECONE_API_KEY=your_key
-```
-
----
-
-## 🎯 Future Improvements
-
-* Frontend dashboard
-* Better scoring model
-* Multi-model support
-* Real-time monitoring
-
----
-
-## 👨‍💻 Author
-
-Ishant Singh
